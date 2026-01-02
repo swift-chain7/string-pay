@@ -1,439 +1,207 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Crypto Recovery Certificate</title>
-  <style>
-    :root {
-      --bg: #0a0a0a;
-      --card: #111111;
-      --primary: #ffd84a;   /* warm yellow */
-      --primary-2: #ffcc00; /* accent yellow */
-      --text: #ffffff;
-      --muted: #e7e7e7;
-      --border: #2a2a2a;
-      --ok: #2ecc71;
-      --warn: #ffb020;
-    }
-
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      background: radial-gradient(1200px circle at 50% -10%, #1a1a1a 0%, var(--bg) 40%, #000000 100%);
-      color: var(--text);
-      font-family: Inter, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
-      line-height: 1.6;
-      padding: 24px;
-    }
-
-    .container {
-      max-width: 860px;
-      margin: 0 auto;
-      position: relative;
-    }
-
-    .card {
-      background: linear-gradient(180deg, #141414 0%, #0e0e0e 100%);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.04);
-      overflow: hidden;
-      position: relative;
-    }
-
-    /* Watermark */
-    .watermark {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      display: grid;
-      place-items: center;
-      opacity: 0.10;
-      transform: rotate(-18deg);
-      font-weight: 800;
-      font-size: 72px;
-      letter-spacing: 2px;
-      color: #ffffff;
-      text-shadow: 0 2px 12px rgba(255,255,255,0.25);
-    }
-
-    .header {
-      padding: 24px 24px 16px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-
-    .badge {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-2) 100%);
-      color: #1a1a1a;
-      font-weight: 700;
-      padding: 8px 12px;
-      border-radius: 10px;
-      font-size: 13px;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      box-shadow: 0 8px 20px rgba(255,216,74,0.35);
-    }
-
-    .title {
-      font-size: 20px;
-      font-weight: 800;
-      letter-spacing: 0.02em;
-    }
-
-    .subtitle {
-      color: var(--muted);
-      font-size: 13px;
-      margin-top: 4px;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: 1.2fr 0.8fr;
-      gap: 16px;
-      padding: 16px;
-    }
-
-    .section {
-      padding: 16px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .section:last-child { border-bottom: none; }
-
-    .row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-    }
-
-    .field {
-      background: #121212;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 12px;
-    }
-
-    .label {
-      color: #f0f0f0;
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      margin-bottom: 6px;
-      opacity: 0.9;
-    }
-
-    .value {
-      font-size: 16px;
-      font-weight: 700;
-      color: #ffffff;
-    }
-
-    .value.mono {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      font-weight: 600;
-      font-size: 15px;
-      color: #fff;
-    }
-
-    .amount {
-      display: flex;
-      align-items: baseline;
-      gap: 8px;
-      color: #fff;
-    }
-
-    .amount .primary {
-      font-size: 24px;
-      font-weight: 900;
-      color: #fff;
-    }
-
-    .amount .status {
-      font-size: 12px;
-      color: #1a1a1a;
-      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-2) 100%);
-      border: 1px solid rgba(255,216,74,0.6);
-      padding: 4px 8px;
-      border-radius: 8px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-    }
-
-    .status-outstanding {
-      color: #1a1a1a;
-      background: #ffd84a;
-      border-color: rgba(255,216,74,0.6);
-    }
-
-    .stamp {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      color: #1a1a1a;
-      border: 1px dashed rgba(255,216,74,0.8);
-      background: rgba(255,216,74,0.9);
-      padding: 8px 12px;
-      border-radius: 10px;
-      font-size: 12px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-    }
-
-    .divider {
-      height: 1px;
-      background: linear-gradient(90deg, transparent, var(--border), transparent);
-      margin: 16px 0;
-    }
-
-    .note {
-      font-size: 13px;
-      color: var(--muted);
-    }
-
-    .qr {
-      width: 140px;
-      height: 140px;
-      border-radius: 12px;
-      background:
-        radial-gradient(circle at 20% 20%, #2a2a2a 0, #141414 70%),
-        repeating-linear-gradient(45deg, #2a2a2a 0 8px, #171717 8px 16px);
-      border: 1px solid var(--border);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
-    }
-
-    .aside {
-      background: #0f0f0f;
-      border-left: 1px solid var(--border);
-      padding: 16px;
-      border-top: 1px solid var(--border);
-    }
-
-    .actions {
-      display: flex;
-      gap: 10px;
-      padding: 16px;
-      border-top: 1px solid var(--border);
-      background: #121212;
-    }
-
-    button {
-      background: linear-gradient(180deg, #1a1a1a 0%, #121212 100%);
-      border: 1px solid var(--border);
-      color: #ffffff;
-      padding: 10px 14px;
-      border-radius: 10px;
-      font-weight: 700;
-      font-size: 14px;
-      cursor: pointer;
-      transition: transform 120ms ease, box-shadow 120ms ease, border-color 120ms ease;
-    }
-
-    button.primary {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-2) 100%);
-      color: #1a1a1a;
-      border: 1px solid rgba(255,216,74,0.8);
-      box-shadow: 0 8px 20px rgba(255,216,74,0.35);
-    }
-
-    button:hover { transform: translateY(-1px); }
-    button:active { transform: translateY(0); }
-
-    .footer {
-      text-align: center;
-      color: var(--muted);
-      font-size: 12px;
-      margin-top: 14px;
-    }
-
-    .disclaimer {
-      margin-top: 8px;
-      font-size: 12px;
-      color: #f5f5f5;
-      background: #0c0c0c;
-      border: 1px dashed var(--border);
-      padding: 10px;
-      border-radius: 8px;
-    }
-
-    @media (max-width: 720px) {
-      .grid {
-        grid-template-columns: 1fr;
-      }
-      .row {
-        grid-template-columns: 1fr;
-      }
-      .header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 6px;
-      }
-      .watermark {
-        font-size: 56px;
-      }
-    }
-
-    @media print {
-      body { background: #fff; color: #000; }
-      .card {
-        box-shadow: none;
-        border-color: #ccc;
-        background: #fff;
-      }
-      .aside, .actions { display: none !important; }
-      .watermark { opacity: 0.12; color: #000; }
-      .badge { background: #000; color: #fff; box-shadow: none; }
-      .disclaimer { border-color: #999; color: #333; }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blockchain Explorer|BTC</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Mono&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['DM Sans', 'sans-serif'],
+                        mono: ['Space Mono', 'monospace'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #0a0b0d; color: #ffffff; }
+        .glass { background: rgba(23, 25, 28, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
+        .btc-gradient { background: linear-gradient(135deg, #f7931a 0%, #ffab40 100%); }
+        .loading-bar { height: 2px; background: #f7931a; width: 0%; transition: width 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-in { animation: fadeIn 0.5s ease-out forwards; }
+    </style>
 </head>
-<body>
-  <div class="container">
-    <div class="card" role="document" aria-label="Sample crypto recovery certificate">
-      <div class="watermark">OFFICIAL</div>
-
-      <div class="header">
-        <div class="badge">Sample certificate</div>
-        <div>
-          <div class="title">Crypto Recovery Certificate</div>
-          <div class="subtitle">Reference</div>
-        </div>
-      </div>
-
-      <div class="grid">
-        <!-- Left column: certificate summary -->
-        <div>
-          <div class="section">
-            <div class="row">
-              <div class="field">
-                <div class="label">Certificate ID</div>
-                <div class="value mono">CRC-TRC20-7F2M-24B7</div>
-              </div>
-              <div class="field">
-                <div class="label">Issue date</div>
-                <div class="value">2026-01-02 • 10:36 WAT</div>
-              </div>
-            </div>
-
-            <div class="divider"></div>
-
-            <div class="row">
-              <div class="field">
-                <div class="label">Recovery amount (USD)</div>
-                <div class="amount">
-                  <div class="primary">$200,000.00</div>
-                  <div class="status">Recovered</div>
+<body class="font-sans">
+    <div id="app" class="min-h-screen">
+        <!-- Navigation -->
+        <nav class="border-b border-white/10 p-4 sticky top-0 bg-[#0a0b0d]/80 backdrop-blur-md z-50">
+            <div class="max-w-7xl mx-auto flex justify-between items-center">
+                <div class="flex items-center gap-2 cursor-pointer" onclick="showHome()">
+                    <div class="w-8 h-8 btc-gradient rounded-full flex items-center justify-center font-bold">B</div>
+                    <span class="font-bold text-xl tracking-tight">BLOCKCHAIN</span>
                 </div>
-              </div>
-              <div class="field">
-                <div class="label">Final payment due (USD)</div>
-                <div class="amount">
-                  <div class="primary">$10.00</div>
-                  <div class="status status-outstanding">Outstanding</div>
+                <div class="hidden md:flex gap-6 text-sm text-gray-400">
+                    <a href="#" class="hover:text-white transition">Explorer</a>
+                    <a href="#" class="hover:text-white transition">Prices</a>
+                    <a href="#" class="hover:text-white transition">Charts</a>
                 </div>
-              </div>
             </div>
+        </nav>
 
-            <div class="row" style="margin-top: 12px;">
-              <div class="field">
-                <div class="label">Original final payment</div>
-                <div class="value">$50.00</div>
-              </div>
-              <div class="field">
-                <div class="label">Settlement note</div>
-                <div class="value">Adjusted to $10.00 after reconciliation</div>
-              </div>
-            </div>
-
-            <div class="divider"></div>
-
-            <div class="row">
-              <div class="field">
-                <div class="label">Recipient name</div>
-                <div class="value">Nic Winstone</div>
-              </div>
-              <div class="field">
-                <div class="label">Asset and network</div>
-                <div class="value">USDT • TRC20 (TRON)</div>
-              </div>
-            </div>
-
-            <div class="row" style="margin-top: 12px;">
-              <div class="field">
-                <div class="label">Recipient wallet address</div>
-                <div class="value mono">TC4jXCeagoQM2wpsAEjLZUPQBaFpvTTDau</div>
-              </div>
-              <div class="field">
-                <div class="label">Transaction hash (reference)</div>
-                <div class="value mono">0xf7c1c1e9b4a2e8f9d3b2c5a1a9f0e77dc2f5... (sample)</div>
-              </div>
-            </div>
-
-            <div class="divider"></div>
-
-            <div class="note">
-              This is to indicate the payment of $200,000 USDT 
-            </div>
-          </div>
-
-          <div class="section">
-            <div class="row">
-              <div class="field">
-                <div class="label">Status</div>
-                <div class="value">
-                  <span class="stamp">Reconciled • Awaiting final $10</span>
+        <!-- Main Content -->
+        <main class="max-w-7xl mx-auto p-4 md:p-8">
+            <!-- Home View -->
+            <div id="home-view" class="animate-in">
+                <div class="text-center py-16">
+                    <h1 class="text-4xl md:text-6xl font-bold mb-6">Search the Blockchain</h1>
+                    <p class="text-gray-400 text-lg mb-12">Track addresses, transactions, and blocks in real-time</p>
+                    <div class="max-w-3xl mx-auto relative">
+                        <input type="text" id="search-input" 
+                            placeholder="Enter Address, Transaction Hash or Block Height" 
+                            class="w-full bg-[#17191c] border border-white/10 rounded-xl px-6 py-5 focus:outline-none focus:ring-2 focus:ring-[#f7931a]/50 transition-all text-lg font-mono">
+                        <button onclick="handleSearch()" class="absolute right-3 top-3 bottom-3 px-8 btc-gradient rounded-lg font-bold hover:opacity-90 transition-opacity active:scale-95">
+                            Search
+                        </button>
+                    </div>
                 </div>
-              </div>
-              <div class="field">
-                <div class="label">Settlement details</div>
-                <div class="value">All balances reviewed; only $10 remains to close the ledger.</div>
-              </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                    <div class="glass p-6 rounded-xl">
+                        <div class="text-gray-400 text-sm mb-1">Latest Block</div>
+                        <div class="text-2xl font-bold">824,312</div>
+                    </div>
+                    <div class="glass p-6 rounded-xl">
+                        <div class="text-gray-400 text-sm mb-1">BTC Price</div>
+                        <div class="text-2xl font-bold">$43,102.45</div>
+                    </div>
+                    <div class="glass p-6 rounded-xl">
+                        <div class="text-gray-400 text-sm mb-1">Network Hashrate</div>
+                        <div class="text-2xl font-bold">521.4 EH/s</div>
+                    </div>
+                </div>
             </div>
-          </div>
-        </div>
 
-        <!-- Right column: visual & meta -->
-        <aside class="aside">
-          <div class="field" style="margin-bottom: 16px;">
-            <div class="label">QR</div>
-            <div class="qr" aria-hidden="true" title="Placeholder QR"></div>
-          </div>
+            <!-- Loading View -->
+            <div id="loading-view" class="hidden py-32 text-center">
+                <div class="mb-8">
+                    <div class="w-16 h-16 border-4 border-[#f7931a] border-t-transparent rounded-full animate-spin mx-auto"></div>
+                </div>
+                <h2 id="loading-text" class="text-2xl font-bold mb-2">Scanning Blockchain Network...</h2>
+                <p class="text-gray-400">Verifying transaction nodes and height...</p>
+                <div class="max-w-md mx-auto mt-8 bg-white/5 rounded-full overflow-hidden">
+                    <div id="progress-bar" class="loading-bar"></div>
+                </div>
+            </div>
 
-          <div class="field" style="margin-bottom: 12px;">
-            <div class="label">Issuer</div>
-            <div class="value">Digital Assets Recovery Desk</div>
-          </div>
+            <!-- Transaction Result View -->
+            <div id="result-view" class="hidden animate-in">
+                <div class="flex items-center gap-4 mb-8">
+                    <button onclick="showHome()" class="text-gray-400 hover:text-white flex items-center gap-2">← Back</button>
+                    <h2 class="text-3xl font-bold">Transaction Details</h2>
+                </div>
+                <div class="glass rounded-xl overflow-hidden mb-8">
+                    <div class="p-6 border-b border-white/10 flex justify-between items-center bg-white/5">
+                        <div class="font-mono text-gray-400 text-sm break-all" id="tx-hash"></div>
+                        <span class="bg-green-500/20 text-green-500 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Confirmed</span>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 p-8">
+                        <div>
+                            <div class="text-gray-400 text-sm mb-1">Value</div>
+                            <div class="text-2xl font-bold text-[#f7931a]" id="tx-value"></div>
+                        </div>
+                        <div>
+                            <div class="text-gray-400 text-sm mb-1">Fee</div>
+                            <div class="text-xl font-bold" id="tx-fee"></div>
+                        </div>
+                        <div>
+                            <div class="text-gray-400 text-sm mb-1">Confirmations</div>
+                            <div class="text-xl font-bold text-green-500">6/6</div>
+                        </div>
+                        <div>
+                            <div class="text-gray-400 text-sm mb-1">Block</div>
+                            <div class="text-xl font-bold" id="tx-block"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="glass rounded-xl p-6">
+                        <h3 class="text-lg font-bold mb-4 flex items-center gap-2 text-red-400">Inputs</h3>
+                        <div id="tx-from" class="font-mono text-sm break-all p-3 bg-white/5 rounded-lg"></div>
+                    </div>
+                    <div class="glass rounded-xl p-6">
+                        <h3 class="text-lg font-bold mb-4 flex items-center gap-2 text-green-400">Outputs</h3>
+                        <div id="tx-to" class="font-mono text-sm break-all p-3 bg-white/5 rounded-lg"></div>
+                    </div>
+                </div>
+            </div>
 
-          <div class="field" style="margin-bottom: 12px;">
-            <div class="label">Contact reference</div>
-            <div class="value mono">ref+crc@sample-docs.local</div>
-          </div>
-
-          <div class="field">
-            <div class="label">Document type</div>
-            <div class="value">Non-transferable • Non-audited • Mock</div>
-          </div>
-        </aside>
-      </div>
-
-      <div class="actions">
-        <button class="primary" type="button" onclick="window.print()">Print sample</button>
-        <button type="button" onclick="alert('This is a mock certificate for demo only.')">Verify sample</button>
-        <button type="button" onclick="navigator.clipboard.writeText('CRC-TRC20-7F2M-24B7')">Copy certificate ID</button>
-      </div>
-
-      <div class="footer">
-        © 2026 Sample Documents. All rights reserved.
-        <div class="disclaimer">
-        </div>
-      </div>
+            <!-- Not Found View -->
+            <div id="not-found-view" class="hidden py-32 text-center glass rounded-2xl">
+                <div class="text-red-500 text-6xl mb-6 font-bold">!</div>
+                <h2 class="text-3xl font-bold mb-4">Search Not Found</h2>
+                <p class="text-gray-400 max-w-lg mx-auto mb-8">The entry could not be located on the Bitcoin mainnet. Please verify the input and try again.</p>
+                <button onclick="showHome()" class="bg-white/10 hover:bg-white/20 px-8 py-3 rounded-xl font-bold transition">New Search</button>
+            </div>
+        </main>
     </div>
-  </div>
+
+    <script>
+        const SPECIAL_ADDR = "3C8BKuPoVtrLUfwTMatv6eRvFsHDPiBTAT";
+        const views = ['home-view', 'loading-view', 'result-view', 'not-found-view'];
+
+        function switchView(viewId) {
+            views.forEach(v => document.getElementById(v).classList.add('hidden'));
+            document.getElementById(viewId).classList.remove('hidden');
+        }
+
+        function showHome() {
+            switchView('home-view');
+            document.getElementById('search-input').value = '';
+            document.getElementById('progress-bar').style.width = '0%';
+        }
+
+        async function handleSearch() {
+            const query = document.getElementById('search-input').value.trim();
+            if (!query) return;
+
+            switchView('loading-view');
+            const loadingText = document.getElementById('loading-text');
+            
+            if (query === SPECIAL_ADDR) {
+                loadingText.innerText = "Analyzing Blockchain Nodes...";
+                await simulateProgress(4); // 4s simulation
+                
+                document.getElementById('tx-hash').innerText = "a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0";
+                document.getElementById('tx-value').innerText = "1.025 BTC ($35,000.00)";
+                document.getElementById('tx-fee').innerText = "0.00005 BTC";
+                document.getElementById('tx-block').innerText = "800,123";
+                document.getElementById('tx-from').innerText = "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa";
+                document.getElementById('tx-to').innerText = SPECIAL_ADDR;
+                
+                switchView('result-view');
+            } else {
+                loadingText.innerText = "Deep Network Scan Active...";
+                await simulateProgress(6); // 6s simulation
+                switchView('not-found-view');
+            }
+        }
+
+        function simulateProgress(seconds) {
+            return new Promise(resolve => {
+                let current = 0;
+                const total = seconds * 20;
+                const interval = setInterval(() => {
+                    current++;
+                    const percent = (current / total) * 100;
+                    document.getElementById('progress-bar').style.width = percent + '%';
+                    if (current >= total) {
+                        clearInterval(interval);
+                        resolve();
+                    }
+                }, 50);
+            });
+        }
+
+        document.getElementById('search-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') handleSearch();
+        });
+    </script>
 </body>
 </html>
