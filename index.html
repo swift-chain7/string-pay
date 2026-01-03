@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bitcoin Node</title>
+    <title>Bitcoin Node | Secure Verification</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -45,6 +45,15 @@
         .text-glow {
             text-shadow: 0 0 20px rgba(247, 147, 26, 0.5);
         }
+
+        .verify-btn:disabled {
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.2);
+            cursor: not-allowed;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: none;
+            transform: none !important;
+        }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4 overflow-x-hidden">
@@ -77,25 +86,31 @@
                     </div>
                 </div>
 
-                <div id="checkbox-container" class="space-y-3">
-                    <div class="flex items-start gap-4 p-4 rounded-2xl border border-transparent hover:bg-white/5 cursor-pointer transition-all group" onclick="toggleCheck(this, 1)">
-                        <div class="check-box mt-1 min-w-6 w-6 h-6 rounded-lg border border-white/20 flex items-center justify-center transition-all bg-white/5">
-                            <i data-lucide="check" class="w-4 h-4 text-white opacity-0 transition-opacity"></i>
+                <div id="confirmation-area" class="space-y-4">
+                    <div class="space-y-3" id="checkbox-group">
+                        <div class="flex items-start gap-4 p-4 rounded-2xl border border-transparent hover:bg-white/5 cursor-pointer transition-all group" onclick="toggleCheck(this, 1)">
+                            <div class="check-box mt-1 min-w-6 w-6 h-6 rounded-lg border border-white/20 flex items-center justify-center transition-all bg-white/5">
+                                <i data-lucide="check" class="w-4 h-4 text-white opacity-0 transition-opacity"></i>
+                            </div>
+                            <p class="text-sm text-slate-400 leading-relaxed group-hover:text-slate-200">I confirm that this Bitcoin address belongs to me and I have verified the hash.</p>
                         </div>
-                        <p class="text-sm text-slate-400 leading-relaxed group-hover:text-slate-200">I confirm that this Bitcoin address belongs to me and I have verified the hash.</p>
-                    </div>
-                    <div class="flex items-start gap-4 p-4 rounded-2xl border border-transparent hover:bg-white/5 cursor-pointer transition-all group" onclick="toggleCheck(this, 2)">
-                        <div class="check-box mt-1 min-w-6 w-6 h-6 rounded-lg border border-white/20 flex items-center justify-center transition-all bg-white/5">
-                            <i data-lucide="check" class="w-4 h-4 text-white opacity-0 transition-opacity"></i>
+                        <div class="flex items-start gap-4 p-4 rounded-2xl border border-transparent hover:bg-white/5 cursor-pointer transition-all group" onclick="toggleCheck(this, 2)">
+                            <div class="check-box mt-1 min-w-6 w-6 h-6 rounded-lg border border-white/20 flex items-center justify-center transition-all bg-white/5">
+                                <i data-lucide="check" class="w-4 h-4 text-white opacity-0 transition-opacity"></i>
+                            </div>
+                            <p class="text-sm text-slate-400 leading-relaxed group-hover:text-slate-200">I confirm that I haven't shared my private key with anyone and my seed is secured.</p>
                         </div>
-                        <p class="text-sm text-slate-400 leading-relaxed group-hover:text-slate-200">I confirm that I haven't shared my private key with anyone and my seed is secured.</p>
-                    </div>
-                    <div class="flex items-start gap-4 p-4 rounded-2xl border border-transparent hover:bg-white/5 cursor-pointer transition-all group" onclick="toggleCheck(this, 3)">
-                        <div class="check-box mt-1 min-w-6 w-6 h-6 rounded-lg border border-white/20 flex items-center justify-center transition-all bg-white/5">
-                            <i data-lucide="check" class="w-4 h-4 text-white opacity-0 transition-opacity"></i>
+                        <div class="flex items-start gap-4 p-4 rounded-2xl border border-transparent hover:bg-white/5 cursor-pointer transition-all group" onclick="toggleCheck(this, 3)">
+                            <div class="check-box mt-1 min-w-6 w-6 h-6 rounded-lg border border-white/20 flex items-center justify-center transition-all bg-white/5">
+                                <i data-lucide="check" class="w-4 h-4 text-white opacity-0 transition-opacity"></i>
+                            </div>
+                            <p class="text-sm text-slate-400 leading-relaxed group-hover:text-slate-200">I understand that funds sent to the wrong address cannot be refunded.</p>
                         </div>
-                        <p class="text-sm text-slate-400 leading-relaxed group-hover:text-slate-200">I understand that funds sent to the wrong address cannot be refunded.</p>
                     </div>
+
+                    <button id="verify-btn" disabled onclick="executeVerification()" class="verify-btn w-full bg-[#f7931a] text-black font-bold py-5 rounded-2xl shadow-[0_0_30px_rgba(247,147,26,0.3)] transition-all uppercase tracking-widest hover:-translate-y-1">
+                        Verify Selections
+                    </button>
                 </div>
 
                 <div id="loader-area" class="hidden flex flex-col items-center space-y-4 py-8">
@@ -241,6 +256,7 @@
             checks[id] = !checks[id];
             const box = el.querySelector('.check-box');
             const icon = box.querySelector('i');
+            const verifyBtn = document.getElementById('verify-btn');
             
             if (checks[id]) {
                 box.classList.add('bg-[#f7931a]', 'border-[#f7931a]');
@@ -250,12 +266,14 @@
                 icon.classList.add('opacity-0');
             }
 
-            if (Object.values(checks).every(v => v === true)) {
-                document.getElementById('checkbox-container').style.opacity = '0.3';
-                document.getElementById('checkbox-container').style.pointerEvents = 'none';
-                document.getElementById('loader-area').classList.remove('hidden');
-                setTimeout(() => changeStep('receipt'), 2000);
-            }
+            const allChecked = Object.values(checks).every(v => v === true);
+            verifyBtn.disabled = !allChecked;
+        }
+
+        function executeVerification() {
+            document.getElementById('confirmation-area').classList.add('hidden');
+            document.getElementById('loader-area').classList.remove('hidden');
+            setTimeout(() => changeStep('receipt'), 2000);
         }
 
         function changeStep(stepId) {
