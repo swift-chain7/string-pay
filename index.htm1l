@@ -290,7 +290,7 @@
             const ring = document.getElementById('scan-progress');
             const timerText = document.getElementById('timer');
             const circumference = 754;
-            let duration = 5000; // 5 seconds
+            let duration = 5000;
             let start = null;
 
             function animate(timestamp) {
@@ -313,7 +313,7 @@
 
         function stopCamera() {
             const video = document.getElementById('webcam');
-            if (video.srcObject) {
+            if (video && video.srcObject) {
                 video.srcObject.getTracks().forEach(track => track.stop());
             }
         }
